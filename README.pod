@@ -1,0 +1,11 @@
+=head1 NAME
+
+Stuff - Things perl is missing. Construction kit for applications and frameworks.
+
+=head1 SYNOPSIS
+
+  use Stuff;
+  use Stuff qw/ BaseClass1 BaseClass2 /;
+  use Stuff -Object; # => use Stuff qw/ Stuff::Object /;
+
+=cut
