@@ -1,4 +1,5 @@
-package Stuff::ExceptionFrame;
+package Stuff::Base::ExceptionFrame;
+
 use Stuff;
 
 sub new {

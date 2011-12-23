@@ -7,8 +7,10 @@ use constant {
   HAS_FEATURE => eval { require feature; }
 };
 
-binmode( $_, ':utf8' )
-  for qw/STDIN STDOUT STDERR/;
+if( HAS_UTF8 ) {
+  binmode( $_, ':utf8' )
+    for qw/STDIN STDOUT STDERR/;
+}
 
 sub import {
   strict->import;
@@ -22,9 +24,11 @@ sub import {
     taint threads unpack
   / );
   
-  ${^OPEN} = ":utf8\0:utf8";
+  if( HAS_UTF8 ) {
+    utf8->import;
+    ${^OPEN} = ":utf8\0:utf8";
+  }
   
-  utf8->import if HAS_UTF8;
   feature->import( sprintf ":%vd", $^V ) if HAS_FEATURE;
 }
 

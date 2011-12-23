@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use Test::More tests => 16;
+use Test::More tests => 17;
 
 BEGIN {
   use_ok 'Stuff';
@@ -47,23 +47,13 @@ BEGIN {
   use Stuff qw/ TestDef::Child1 /;
 }
 
-sub check_strict {
-  my( $name, $code ) = @_;
-  
-  ok( do {
-    local $SIG{__WARN__} = sub {};
-    
-        eval qq{ use Stuff; no strict '$name'; $code; }
-    && !eval qq{ no strict '$name'; use Stuff; $code; }
-  }, qq/strict "$name"/ );
-}
+# isa.
+isa_ok 'TestDef::Child1', 'TestDef::Base';
+isa_ok 'TestDef::Child2', 'TestDef::Base';
+isa_ok 'TestDef::Child3', 'TestDef::Base';
+isa_ok 'TestDef::Child3', 'TestDef::Child1';
 
-# Check strictness.
-check_strict 'subs', 'my $var = Hello';
-check_strict 'vars', '$var = 1';
-check_strict 'refs', '*{"__"} = {}';
-
-# Check defs.
+# defs.
 is TestDef::Base::APPLE,     'McIntosh'      , 'TestDef::Base::APPLE';
 is TestDef::Child1::APPLE,   'Granny Smith'  , 'TestDef::Child1::APPLE';
 is TestDef::Child2::APPLE,   'McIntosh'      , 'TestDef::Child2::APPLE';
@@ -79,4 +69,3 @@ is TestDef::Child1::table,   'something'     , 'TestDef::Child1::table';
 is TestDef::Child2::table,   'child2'        , 'TestDef::Child2::table';
 is TestDef::Child3::table,   'something'     , 'TestDef::Child3::table';
 
-# TODO: Check warnings.

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use Test::More tests => 14;
+use Test::More tests => 16;
 
 BEGIN {
   use_ok 'Stuff::Base::Object';
@@ -14,6 +14,9 @@ BEGIN {
   our $count = 0;
   has -attr4 => sub { $count++; 'attr4' };
 }
+
+can_ok 'TestObject', 'new';
+can_ok 'TestObject', 'has';
 
 my $obj1 = TestObject->new( attr1 => 10, attr2 => 20 );
 my $obj2 = TestObject->new( attr2 => undef );

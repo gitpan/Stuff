@@ -1,16 +1,18 @@
 package Stuff::Exception;
 
-use Stuff qw/ Exporter /;
+use Stuff 'Exporter';
 use Scalar::Util qw/ blessed /;
 use Stuff::Base::Exception;
 use Stuff::Base::Error;
 
+our %expected;
 our @EXPORT_OK = qw/ error rethrow try catch /;
 
+# 
 my $exception_class = 'Stuff::Base::Exception';
-my $error_class = 'Stuff::Base::Error';
+my $error_class     = 'Stuff::Base::Error';
 
-sub error {
+sub error($@) {
   $error_class->throw( @_ );
 }
 
@@ -22,8 +24,6 @@ sub rethrow(;$) {
   
   $error_class->throw( $e );
 }
-
-our %expected;
 
 sub try(&) {
   my $code = shift;
@@ -51,13 +51,12 @@ sub catch(&$) {
   return;
 }
 
-sub croak {
-  for( $_[0] ) {
-    die $_ if $_ =~ /\n/;
-    
-    my( $file, $line ) = ( caller( 1 + $_[1] ) )[1,2];
-    die "$_ at $file line $line.\n";
-  }
-}
-
 1;
+
+=head1 NAME
+
+Stuff::Exception
+
+=head1 SYNOPSIS
+
+=cut

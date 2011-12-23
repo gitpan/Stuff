@@ -3,7 +3,7 @@ package Stuff;
 use Stuff::Features;
 use Carp ();
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 sub def {
   my( $pkg, $name, $v ) = @_;
@@ -28,8 +28,12 @@ sub def {
       }
     };
     
-    # Compile code.
-    *{ "$pkg\::$name" } = eval $code;
+    # Compile code.    
+    my $sub = eval $code;
+    die $@ if $@;
+    
+    # Create named sub.
+    *{ "$pkg\::$name" } = $sub;
     
     # Remember original code to generate defs in child classes.
     _defs( $pkg )->{ $name } = $v;
@@ -94,9 +98,7 @@ sub extend {
   no strict 'refs';
   
   my @bases;
-  while( @_ ) {
-    my $base = shift;
-    
+  for my $base( map { split( /\s+/, $_ ) } @_ ) {
     # Options or short base classes.
     if( $base =~ s/^-// ) {
       $base = 'Stuff::Base::'.$base;
@@ -190,6 +192,7 @@ Stuff - Things perl is missing. Construction kit for applications and frameworks
 
   use Stuff;
   use Stuff qw/ BaseClass1 BaseClass2 /;
+  use Stuff 'BaseClass1 BaseClass2'; # yeah! single string - multiple modules
   use Stuff -Object; # => use Stuff qw/ Stuff::Object /;
 
   package BaseClass;
@@ -203,21 +206,52 @@ Stuff - Things perl is missing. Construction kit for applications and frameworks
   print x;
   hello( 2 );
 
+=head1 DESCRIPTION
+
+  use Stuff;
+  use Stuff @base_packages;
+
+Features from C<Stuff::Features> exported into caller code.
+Loads C<@base_packages> and adds them to caller's ISA and inherit defs from them.
+
 =head1 FUNCTIONS
 
 =head2 C<def>
 
-  def $class, 'name' => $value;
-  def $class, -name  => $value;
+  Stuff::def( $package, 'name' => $value );
+  Stuff::def( $package, -name  => $value );
 
-Defines a function or constant in package $class that will be exported into
-child package with "use Stuff" or "Stuff->import".
+Defines a function or constant in package C<$package> that will be exported into
+child package with C<use Stuff> or C<<Stuff->import>>.
 
-=head2 C<inherit_defs>
+=head2 C<extend>
+
+  Stuff::extend( $package, @base_packages );
+
+Adds C<@base_packages> to C<$package>'s ISA packages and inherit defs from C<@base_packages>.
+
+=head2 C<load>
+
+  Stuff::load( $module [, $exception_converter] );
+
+Loads module by its name (e.g. 'Some::Module').
+If module can't be found, returns empty list or undef.
+If module loads normally or been loaded before, returns 1.
+If any error happen duering loading, this error will be thrown.
+
+Second optional argument defines "error handler" or "exception converter".
+The only purpose for it is conversion of standart perl error into your custom error object. Like this:
+
+  use Scalar::Util 'blessed';
+  
+  Stuff::load( $module, sub {
+    $@->rethrow if blessed $@;
+    $exception_class->throw( $@ );
+  } );
 
 =head1 SEE ALSO
 
-L<Stuff::Features>, L<Stuff::Util>, L<Stuff::Exception>
+L<Stuff::Features>
 
 =head1 LICENSE
 
