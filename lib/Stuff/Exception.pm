@@ -55,8 +55,16 @@ sub catch(&$) {
 
 =head1 NAME
 
-Stuff::Exception
+Stuff::Exception - Exception handling stuff
 
-=head1 SYNOPSIS
+=head1 LICENSE
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+=head1 AUTHOR
+
+Nikita Zubkov E<lt>nikzubkov@gmail.comE<gt>.
 
 =cut
+

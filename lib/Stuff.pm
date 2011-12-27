@@ -1,9 +1,10 @@
 package Stuff;
 
+use 5.006;
 use Stuff::Features;
 use Carp ();
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 sub def {
   my( $pkg, $name, $v ) = @_;
@@ -28,7 +29,7 @@ sub def {
       }
     };
     
-    # Compile code.    
+    # Compile code.
     my $sub = eval $code;
     die $@ if $@;
     
@@ -186,33 +187,20 @@ sub import {
 
 =head1 NAME
 
-Stuff - Things perl is missing. Construction kit for applications and frameworks.
+Stuff - Things perl is missing. Construction kit for applications and frameworks. Be short.
+
+=head1 NOTE
+
+This framework is NOT STABLE yet and API can change without any warning!
+Writing of documentation is in progress.
 
 =head1 SYNOPSIS
 
   use Stuff;
-  use Stuff qw/ BaseClass1 BaseClass2 /;
-  use Stuff 'BaseClass1 BaseClass2'; # yeah! single string - multiple modules
-  use Stuff -Object; # => use Stuff qw/ Stuff::Object /;
-
-  package BaseClass;
-  use Stuff;
-  def x => 10;
-  def hello => sub { print "I'm called from $_[0] with argument $_[1]" };
-  hello( 1 );
-  
-  package SomeClass;
-  use Stuff qw/ BaseClass /;
-  print x;
-  hello( 2 );
-
-=head1 DESCRIPTION
-
-  use Stuff;
   use Stuff @base_packages;
 
-Features from C<Stuff::Features> exported into caller code.
-Loads C<@base_packages> and adds them to caller's ISA and inherit defs from them.
+Features from C<Stuff::Features> exported into caller code. Loads C<@base_packages> and adds
+them to caller's ISA and inherit defs from them.
 
 =head1 FUNCTIONS
 
@@ -248,6 +236,51 @@ The only purpose for it is conversion of standart perl error into your custom er
     $@->rethrow if blessed $@;
     $exception_class->throw( $@ );
   } );
+
+=head1 DEFS
+
+Defs are designed for easy DSL (domain specific language) creation.
+Here is an example of DSL for database model's table.
+
+  # BaseModel.pm
+  package BaseModel;
+  use Stuff;
+  
+  # Default value for table.
+  def table => sub() {
+    my $pkg = ref $_[0] || $_[0];
+    $pkg =~ s/.*::([^:]+)(?:::)?$/$1/;
+    $pkg =~ s/Model$//;
+    return lc $pkg;
+  };
+  
+  # Set custom value for table.
+  def set_table => sub {
+    Stuff::def $_[0], 'table', $_[1];
+  };
+  1;
+
+  # MessageModel.pm
+  package MessageModel;
+  use Stuff 'BaseModel';
+  1;
+
+  # UserModel.pm
+  package UserModel;
+  use Stuff 'BaseModel';
+  set_table 'account';
+  1;
+
+  # Test it.
+  use Test::More tests => 4;
+  use UserModel;
+  use MessageModel;
+  is( UserModel->table, 'account' );
+  is( UserModel::table, 'account' );
+  is( MessageModel->table, 'message' );
+  is( MessageModel::table, 'message' );
+
+L<Stuff::Base::Object>'s C<has> is a def.
 
 =head1 SEE ALSO
 

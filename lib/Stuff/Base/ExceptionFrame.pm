@@ -28,3 +28,19 @@ BEGIN {
 }
 
 1;
+
+=head1 NAME
+
+Stuff::Base::ExceptionFrame - Class for exception frame.
+
+=head1 LICENSE
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+=head1 AUTHOR
+
+Nikita Zubkov E<lt>nikzubkov@gmail.comE<gt>.
+
+=cut
+

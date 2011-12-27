@@ -13,6 +13,9 @@ use overload
 # Message associated with exception.
 has -message;
 
+# Verbosity level of "to_string".
+has verbose => 1;
+
 # Collect exception frames?
 #  * false - collect
 #  * true - don't collect
@@ -44,7 +47,7 @@ has frames => sub {
 
 # Constructor.
 sub new {
-  my $self = shift->SUPER::new( ( @_ == 1 && !ref $_[0] ) ? ( message => $_[0] ) : @_ );
+  my $self = shift->SUPER::new( @_ == 1 ? ( message => $_[0] ) : @_ );
   
   # Collect raw_frames.
   $self->raw_frames;
@@ -98,24 +101,36 @@ sub _collect_frames {
 
 =head1 NAME
 
-Stuff::Base::Exception - Exception class
+Stuff::Base::Exception - Exception class.
 
 =head1 SYNOPSIS
+
+  # Create own exception class.
+  package HttpAbortException;
+  use Stuff -Exception; # <= push @ISA, qw( Stuff::Base::Exception );
+  has status => 0;
+  has no_frames => 1;
   
-  # Exception instantiation.
-  $exception_class->new( 'oops!' );
-  $exception_class->new( message => 'oops!', no_frames => 1 );
-  $exception_class->new( { messaeg => 'oops!', raw_frames => [ ... ] } );
+  # Instantiate exception.
+  my $e = HttpAbortException->new( status => 404, message => 'Request aborted' );
+  
+  # 
+  say $e->status; # => 404
+  
+  # Automatic stringification.
+  say $e; # => 'Request aborted'
   
   # Throw exception.
-  $exception_class->throw( 'oops!' );
-  $exception_class->throw( message => 'oops!', no_frames => 1 );
-  $exception_class->throw( { messaeg => 'oops!', raw_frames => [ ... ] } );
+  $e->throw;
   
-  # Custom exception.
-  package MyException;
-  use Stuff -Exception;
-  has no_frames => 1; # do not collect frames
+  # Or instantiate and throw.
+  HttpAbortException->throw( status => 404 );
+  
+  eval {
+    HttpAbortException->throw( status => 404 );
+  };
+  
+  $@->status; # => 404
 
 =head1 METHODS
 
@@ -123,17 +138,32 @@ C<Stuff::Base::Exception> inherit all methods from Stuff::Base::Object and imple
 
 =head2 new
 
+  $package->new;
+  $package->new( $message );
+  $package->new( %args );
+
 =head2 throw
 
-=head2 rethrow
+  $package->throw;
+  $package->throw( $message );
+  $package->throw( %args );
+  $object->throw;
 
 =head2 to_string
+
+  $object->to_string;
+
+Returns a string that representing exception. Usually this is value of message translated to string.
 
 =head1 ATTRIBUTES
 
 =head2 message
 
+A message associated with exception. In general cases it should not be only string or number, any reference is acceptable.
+
 =head2 no_frames
+
+If it has true value then no stack frames will be collected duering object instantiation. Default value if false. 
 
 =head2 raw_frames
 
@@ -141,4 +171,18 @@ C<Stuff::Base::Exception> inherit all methods from Stuff::Base::Object and imple
 
 =head2 frame_class
 
+=head1 SEE ALSO
+
+L<Stuff>, L<Stuff::Exception>
+
+=head1 LICENSE
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+=head1 AUTHOR
+
+Nikita Zubkov E<lt>nikzubkov@gmail.comE<gt>.
+
 =cut
+

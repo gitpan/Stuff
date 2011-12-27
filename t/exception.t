@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use Test::More tests => 10;
+use Test::More tests => 9;
 
 BEGIN {
   use_ok 'Stuff::Exception';
@@ -15,7 +15,6 @@ use Scalar::Util qw/ blessed /;
 
 is( TestException->new( "123" )->message, '123' );
 is( TestException->new( message => "123" )->message, '123' );
-is( TestException->new( { message => "123" } )->message, '123' );
 
 eval { TestException->throw( "123" ) };
 ok blessed( $@ ) && $@->isa( 'TestException' ), 'exception isa';
