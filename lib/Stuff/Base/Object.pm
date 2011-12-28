@@ -1,6 +1,7 @@
 package Stuff::Base::Object;
 
-use Stuff;
+use Stuff::Features;
+use Stuff::Base;
 
 # Attribute maker.
 def has => sub { shift->define_attr( @_ ) };
@@ -96,12 +97,15 @@ sub _generate_accessor {
 
 =head1 NAME
 
-Stuff::Base::Object - Simple object with attributes
+Stuff::Base::Object - Simple and powerful object class with attributes
 
-=head1 LICENSE
+=head1 METHODS
 
-This program is free software, you can redistribute it and/or modify it under
-the terms of the Artistic License 2.0.
+=head2 C<new>
+
+=head2 C<define_attr>
+
+=head2 C<has>
 
 =head1 AUTHOR
 

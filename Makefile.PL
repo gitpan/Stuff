@@ -8,7 +8,9 @@ my %args = (
   VERSION_FROM => 'lib/Stuff.pm',
   AUTHOR => 'Nikita Zubkov <nikzubkov@gmail.com>',
   PREREQ_PM => {
-    'Test::More' => 0
+    'Carp' => 0,
+    'Scalar::Util' => 0,
+    'Test::More' => 0,
   },
   test => { TESTS => 't/*.t' }
 );

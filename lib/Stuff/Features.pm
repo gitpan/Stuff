@@ -1,5 +1,6 @@
 package Stuff::Features;
 
+use 5.006;
 use strict;
 use utf8;
 no warnings;
@@ -14,6 +15,7 @@ sub import {
   # use strict;
   strict->import;
   
+  # no warnings;
   # use warnings( FATAL => ... );
   warnings->unimport;
   warnings->import( FATAL => qw/
@@ -47,6 +49,7 @@ Stuff::Features
 is a short replacement for
 
   use strict;
+  no warnings;
   use warnings( FATAL => qw/
     closure deprecated glob
     closed layer pipe
@@ -56,16 +59,11 @@ is a short replacement for
   / );
   use utf8;
   use open qw/:utf8 :std/;
-  use fetures qw/sat switch/;
+  use feature qw/say switch/;
 
 =head1 SEE ALSO
 
 L<Stuff>
-
-=head1 LICENSE
-
-This program is free software, you can redistribute it and/or modify it under
-the terms of the Artistic License 2.0.
 
 =head1 AUTHOR
 

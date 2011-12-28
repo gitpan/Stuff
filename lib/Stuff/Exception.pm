@@ -1,20 +1,24 @@
 package Stuff::Exception;
 
-use Stuff 'Exporter';
-use Scalar::Util qw/ blessed /;
+use Stuff::Features;
+use Stuff::Base ();
 use Stuff::Base::Exception;
 use Stuff::Base::Error;
+use Stuff::Util qw/ plainize /;
+use Scalar::Util qw/ blessed /;
+use Carp;
 
-our %expected;
-our @EXPORT_OK = qw/ error rethrow try catch /;
+# Export.
+use Exporter 'import';
+our @EXPORT_OK = qw/ expect catch caught rethrow /;
+our %EXPORT_TAGS = { all => \@EXPORT_OK };
 
-# 
+# List of expected exception classes.
+our @expected;
+
+# Exception classes.
 my $exception_class = 'Stuff::Base::Exception';
 my $error_class     = 'Stuff::Base::Error';
-
-sub error($@) {
-  $error_class->throw( @_ );
-}
 
 sub rethrow(;$) {
   my $e = @_ ? $_[0] : $@;
@@ -25,29 +29,52 @@ sub rethrow(;$) {
   $error_class->throw( $e );
 }
 
-sub try(&) {
+sub catch(&;$) {
   my $code = shift;
   
-  local $@;
-  local $SIG{__DIE__} = \&rethrow;
-  
-  eval { &$code(); };
-  
-  return $@;
-}
-
-sub catch(&$) {
-  my( $code, $e ) = @_;
-  
-  local %expected = map { $_ => 1 } map { ref $_ ? @$_ : $_ } $e;
-  local $SIG{__DIE__} = \&rethrow;
-  
-  eval { &$code(); };
+  eval {
+    local $SIG{__DIE__} = \&rethrow;
+    &$code();
+  };
   
   if( $@ ) {
-    return $@ if $expected{ ref $@ };
+    return $@ unless defined $_[0];
+    if( blessed $@ ) {
+      for( plainize $_[0] ) {
+        return $@ if $@->isa( $_ );
+      }
+    }
+    die $@;
   }
   
+  return;
+}
+
+sub caught {
+  my $e = @_ > 1 ? $_[1] : $@;
+  blessed( $e ) && $e->isa( $_[0] );
+}
+
+sub is_expected {
+  my $e = $_[0];
+  return unless blessed $e;
+  for( @expected ) {
+    return 1 if $e->isa( $_ );
+  }
+  return;
+}
+
+sub expect(&;$) {
+  my $code = shift;
+  
+  local @expected = defined $_[0] ? plainize $_[0] : ();
+  
+  eval {
+    local $SIG{__DIE__} = \&rethrow;
+    &$code();
+  };
+  
+  return $@ if $@ && is_expected $@;
   return;
 }
 
@@ -57,14 +84,18 @@ sub catch(&$) {
 
 Stuff::Exception - Exception handling stuff
 
-=head1 LICENSE
+=head1 FUNCTIONS
 
-This program is free software, you can redistribute it and/or modify it under
-the terms of the Artistic License 2.0.
+=head2 C<catch>
+
+=head2 C<caught>
+
+=head2 C<expect>
+
+=head2 C<rethrow>
 
 =head1 AUTHOR
 
 Nikita Zubkov E<lt>nikzubkov@gmail.comE<gt>.
 
 =cut
-

@@ -1,12 +1,16 @@
 package Stuff::Base::Error;
 
-use Stuff -Exception;
+use Stuff::Features;
+use Stuff::Base -Exception;
+
+has message => 'Error!';
+has verbose => 1;
 
 1;
 
 =head1 NAME
 
-Stuff::Base::Error - Error exception class.
+Stuff::Base::Error - Error exception class
 
 =head1 DESCRIPTION
 
@@ -19,11 +23,6 @@ C<Stuff::Base::Error> inherit all methods and attributes from C<Stuff::Base::Exc
 =head1 SEE ALSO
 
 L<Stuff>, L<Stuff::Exception>, L<Stuff::Base::Exception>
-
-=head1 LICENSE
-
-This program is free software, you can redistribute it and/or modify it under
-the terms of the Artistic License 2.0.
 
 =head1 AUTHOR
 

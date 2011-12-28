@@ -8,7 +8,7 @@ BEGIN {
 
 BEGIN {
   package TestObject;
-  use Stuff -Object;
+  use Stuff::Base -Object;
   has -attr1;
   has [qw/ attr2 attr3 /] => 'attr';
   our $count = 0;

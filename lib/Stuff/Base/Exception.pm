@@ -1,6 +1,7 @@
 package Stuff::Base::Exception;
 
-use Stuff -Object;
+use Stuff::Features;
+use Stuff::Base -Object;
 use Stuff::Base::ExceptionFrame;
 use Scalar::Util 'blessed';
 
@@ -11,10 +12,10 @@ use overload
   fallback => 1;
 
 # Message associated with exception.
-has -message;
+has message => 'Exception!';
 
 # Verbosity level of "to_string".
-has verbose => 1;
+has verbose => 0;
 
 # Collect exception frames?
 #  * false - collect
@@ -57,12 +58,20 @@ sub new {
 
 # Exception stringificator.
 sub to_string {
-  ''.$_[0]->{message}
+  my $self = shift;
+  my $message = ''.$self->message;
+  
+  
+  $message;
 }
 
 # Check whatever this exception is expected and we can skip frames collection.
 sub is_expected {
-  $Stuff::Exception::expected{ ref $_[0] };
+  my $self = shift;
+  for( @Stuff::Exception::expected ) {
+    return 1 if $self->isa( $_ );
+  }
+  return;
 }
 
 # Throw exception.
@@ -101,7 +110,7 @@ sub _collect_frames {
 
 =head1 NAME
 
-Stuff::Base::Exception - Exception class.
+Stuff::Base::Exception - Exception with context
 
 =head1 SYNOPSIS
 
@@ -114,7 +123,7 @@ Stuff::Base::Exception - Exception class.
   # Instantiate exception.
   my $e = HttpAbortException->new( status => 404, message => 'Request aborted' );
   
-  # 
+  # Get attibute.
   say $e->status; # => 404
   
   # Automatic stringification.
@@ -152,22 +161,27 @@ C<Stuff::Base::Exception> inherit all methods from Stuff::Base::Object and imple
 =head2 to_string
 
   $object->to_string;
+  "$object";
 
-Returns a string that representing exception. Usually this is value of message translated to string.
+Returns a string that represents exception. By default it is a message translated to string.
 
 =head1 ATTRIBUTES
 
 =head2 message
 
-A message associated with exception. In general cases it should not be only string or number, any reference is acceptable.
+Optional message associated with exception. In general cases it can be any object, not string and number only.
 
 =head2 no_frames
 
-If it has true value then no stack frames will be collected duering object instantiation. Default value if false. 
+If it has true value then no stack frames will be collected duering object instantiation. Default value is false. 
 
 =head2 raw_frames
 
+Stack frames, as they come from caller(...).
+
 =head2 frames
+
+Stack frames converted to objects.
 
 =head2 frame_class
 
@@ -175,14 +189,8 @@ If it has true value then no stack frames will be collected duering object insta
 
 L<Stuff>, L<Stuff::Exception>
 
-=head1 LICENSE
-
-This program is free software, you can redistribute it and/or modify it under
-the terms of the Artistic License 2.0.
-
 =head1 AUTHOR
 
 Nikita Zubkov E<lt>nikzubkov@gmail.comE<gt>.
 
 =cut
-
