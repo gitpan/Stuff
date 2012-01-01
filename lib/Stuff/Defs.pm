@@ -5,6 +5,36 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw/ def inherit_defs /;
 
+sub wrap_code {
+  my( $pkg, $v ) = @_;
+  
+  # Respect prototypes.
+  my $proto = prototype $v;
+  $proto = "($proto)" if defined $proto;
+  
+  # Generate code.
+  my $code = qq{
+    package $pkg;
+    sub $proto {
+      unshift \@_, __PACKAGE__
+        unless \@_ && UNIVERSAL::isa( \$_[0], __PACKAGE__ );
+      
+      return &\$v( \@_ );
+    }
+  };
+  
+  # Compile code.
+  my $sub = eval $code;
+  die $@ if $@;
+  
+  return $sub;
+}
+
+sub _defs {
+  no strict 'refs';
+  \%{ $_[0].'::_STUFF_DEFS_' }
+}
+
 sub def {
   my( $pkg, $name, $v ) = @_;
   
@@ -13,24 +43,7 @@ sub def {
   $name =~ s/^-//;
   
   if( ref $v eq 'CODE' ) {
-    # Respect prototypes.
-    my $proto = prototype $v;
-    $proto = "($proto)" if defined $proto;
-    
-    # Generate code.
-    my $code = qq{
-      package $pkg;
-      sub $proto {
-        unshift \@_, __PACKAGE__
-          unless \@_ && UNIVERSAL::isa( \$_[0], __PACKAGE__ );
-        
-        return &\$v( \@_ );
-      }
-    };
-    
-    # Compile code.
-    my $sub = eval $code;
-    die $@ if $@;
+    my $sub = wrap_code( $pkg, $v );
     
     # Place sub.
     *{ "$pkg\::$name" } = $sub;
@@ -46,7 +59,7 @@ sub def {
     
     # Place sub.
     {
-      local $SIG{__WARN__} = sub {}; # silent prototype mismatch warnings;
+      local $SIG{__WARN__} = sub {}; # silent "constant subroutine redefined" warnings;
       *{ "$pkg\::$name" } = $sub;
     }
     
@@ -57,43 +70,56 @@ sub def {
   return;
 }
 
-sub inherit_defs {
-  my( $from, $to ) = @_;
+sub remove_def {
+  my $pkg = shift;
   
   no strict 'refs';
   
-  my $from_defs = _defs( $from );
-  
-  # For each def in $from package.
-  for my $name( keys %$from_defs ) {
+  while( @_ ) {
+    my $name = shift;
+    $name =~ s/^-//;
     
-    # Skip if sub already exists.
-    next if defined *{ "$to\::$name" }{CODE};
-    
-    my $v = $from_defs->{$name};
-    
-    if( ref $v eq 'CODE' ) {
-      # Rewrap def.
-      def( $to, $name, $from_defs->{$name} );
-    }
-    else {
-      # Make an alias for constants.
-      *{ "$to\::$name" } = \&{ "$from\::$name" };
-      _defs( $to )->{ $name } = 1;
-    }
+    undef &{ "$pkg\::$name" };
+    delete _defs( $pkg )->{ $name };
   }
 }
 
-sub _defs {
+sub inherit_defs {
+  my $to = shift;
+  
   no strict 'refs';
-  \%{ $_[0].'::_STUFF_DEFS_' }
+  
+  my $to_defs = _defs( $to );
+  
+  my %skip;
+  for my $from( @_ ) {
+    my $from_defs = _defs( $from );
+    
+    for my $name( keys %$from_defs ) {
+      next if $skip{$name};
+      
+      my $v = $from_defs->{$name};
+      
+      if( ref $v eq 'CODE' ) {
+        # Rewrap def.
+        def( $to, $name, $from_defs->{$name} );
+      }
+      else {
+        # Make an alias for constants.
+        *{ "$to\::$name" } = \&{ "$from\::$name" };
+        $to_defs->{ $name } = 1;
+      }
+      
+      $skip{$name} = 1;
+    }
+  }
 }
 
 1;
 
 =head1 NAME
 
-Stuff::Defs
+Stuff::Defs - Defs stuff
 
 =head1 WHAT IS IT?
 
@@ -116,17 +142,20 @@ Here is an example of DSL for database model's table.
   def set_table => sub {
     Stuff::def $_[0], 'table', $_[1];
   };
+  
   1;
 
   # MessageModel.pm
   package MessageModel;
   use Stuff 'BaseModel';
+  
   1;
 
   # UserModel.pm
   package UserModel;
   use Stuff 'BaseModel';
   set_table 'account';
+  
   1;
 
   # Test it.

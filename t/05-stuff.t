@@ -9,7 +9,7 @@ BEGIN {
 
 BEGIN {
   package TestDef::Base;
-  use Stuff;
+  use Stuff -def;
   
   $INC{'TestDef/Base.pm'} = __FILE__;
   

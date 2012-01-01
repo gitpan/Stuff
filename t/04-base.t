@@ -1,17 +1,18 @@
 #!/usr/bin/env perl
 
-use Test::More tests => 17;
+use Test::More tests => 25;
 use Stuff::Features;
 
 BEGIN {
   use_ok 'Stuff::Base';
+  *relative_package = \&Stuff::Base::relative_package;
 }
 
 BEGIN {
   $INC{'TestDef/Base.pm'} = __FILE__;
   
   package TestDef::Base;
-  use Stuff::Base;
+  use Stuff::Base -def;
   
   def APPLE => 'McIntosh';
   def PEAR => 'Pyrus communis';
@@ -68,3 +69,13 @@ is TestDef::Base::table,     'base'          , 'TestDef::Base::table';
 is TestDef::Child1::table,   'something'     , 'TestDef::Child1::table';
 is TestDef::Child2::table,   'child2'        , 'TestDef::Child2::table';
 is TestDef::Child3::table,   'something'     , 'TestDef::Child3::table';
+
+
+is relative_package( 'A::B::C::D', 0, 'E' ), 'A::B::C::D::E';
+is relative_package( 'A::B::C::D', 1, 'E' ), 'A::B::C::E';
+is relative_package( 'A::B::C::D', 2, 'E' ), 'A::B::E';
+is relative_package( 'A::B::C::D', 3, 'E' ), 'A::E';
+is relative_package( 'A::B::C::D', 4, 'E' ), 'E';
+is relative_package( 'A::B::C::D', 5, 'E' ), 'E';
+is relative_package( 'A::B::C::D', 6, 'E' ), 'E';
+is relative_package( 'A::B::C::D', 7, 'E' ), 'E';

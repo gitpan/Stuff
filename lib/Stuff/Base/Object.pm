@@ -1,7 +1,7 @@
 package Stuff::Base::Object;
 
 use Stuff::Features;
-use Stuff::Base;
+use Stuff::Base -def;
 
 # Attribute maker.
 def has => sub { shift->define_attr( @_ ) };
@@ -61,7 +61,7 @@ sub _generate_accessor {
   # Code for default value generator.
   my $default_code = defined $default ? (
     ref $default eq 'CODE' ? '$default->(@_)' :
-    ref $default ? 'Carbon::Util::clone( $default )' :
+    ref $default ? 'Stuff::Util::clone( $default )' :
     '$default'
   ) : '';
   
@@ -88,7 +88,7 @@ sub _generate_accessor {
   my $sub = eval $code;
   
   # Handle compilation errors.
-  die "${\(__PACKAGE__)} accessor compilation error: \n$code\n$@\n" if $@;
+  die "Accessor compilation error: \n$code\n$@\n" if $@;
   
   return $sub;
 }
@@ -97,11 +97,28 @@ sub _generate_accessor {
 
 =head1 NAME
 
-Stuff::Base::Object - Simple and powerful object class with attributes
+Stuff::Base::Object - Object class with attributes
+
+=head1 SYNOPSIS
+
+  package Person;
+  use Stuff -Object;
+  
+  has -age;
+  has mood => 'Good!';
+  
+  say Person->new( age => 28 )->age;
+  say Person->new->age( 28 )->age;
+  say Person->new->mood;
+  say Person->new( mood => 'Boring' )->mood;
 
 =head1 METHODS
 
 =head2 C<new>
+
+  $package->new;
+  $package->new( \%attrs );
+  $package->new( %attrs );
 
 =head2 C<define_attr>
 

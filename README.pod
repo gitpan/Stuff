@@ -1,5 +1,5 @@
 =head1 NAME
 
-Stuff - Things perl is missing. Construction kit for applications and frameworks.
+Stuff - Object oriented programming framework
 
 =cut

@@ -3,9 +3,8 @@ package Stuff;
 use Stuff::Features;
 use Stuff::Base;
 use Stuff::Defs qw/ def /;
-use Stuff::Exception;
 
-our $VERSION = '0.0.5';
+our $VERSION = '0.0.6';
 
 sub import {
   shift;
@@ -17,7 +16,7 @@ sub import {
 
 =head1 NAME
 
-Stuff - Things perl is missing. Construction kit for applications and frameworks. Be short.
+Stuff - Object oriented programming framework
 
 =head1 NOTE
 
@@ -28,14 +27,14 @@ Writing of documentation still in progress.
 
 Frontend to C<Stuff::Features>, C<Stuff::Base> and C<Stuff::Defs>.
 
-  use Stuff @base_packages;
+  use Stuff @args;
 
 is equivalent to
 
   use Stuff::Features;
-  use Stuff::Base @base_packages;
+  use Stuff::Base @args;
 
-It is better to use it in your code, instead of C<Stuff::Features>, C<Stuff::Base> and C<Stuff::Defs>.
+It is better to use C<use Stuff> in your code, instead of separate C<Stuff::Features>, C<Stuff::Base> and C<Stuff::Defs>.
 
 =head1 SEE ALSO
 
@@ -43,10 +42,10 @@ L<Stuff::Features>, L<Stuff::Base>, L<Stuff::Defs>, L<Stuff::Exception>
 
 =head1 REPOSITORY
 
-L<https://github.com/vokbuz/stuff>
+L<https://github.com/vokbuz/p5-stuff>
 
 =head1 AUTHOR
 
-Nikita Zubkov E<lt>nikzubkov@gmail.comE<gt>.
+Nikita Zubkov E<lt>nikzubkov@gmail.comE<gt>
 
 =cut

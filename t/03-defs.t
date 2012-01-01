@@ -24,7 +24,7 @@ is( prototype \&TestPackage1::arguments, '$' );
 is( TestPackage1::arguments( 'hello' ), 'hello' );
 is( TestPackage1->arguments( 'hello' ), 'hello' );
 
-inherit_defs( 'TestPackage1', 'TestPackage2' );
+inherit_defs( 'TestPackage2', 'TestPackage1' );
 
 can_ok( 'TestPackage2', 'def' );
 can_ok( 'TestPackage2', 'arguments' );

@@ -1,6 +1,6 @@
 package Stuff::Features;
 
-use 5.006;
+use 5.008;
 use strict;
 use utf8;
 no warnings;
@@ -29,7 +29,7 @@ sub import {
   # use utf8;
   utf8->import;
   
-  # use open qw/:utf8 :std/;
+  # use open qw/:utf8/;
   ${^OPEN} = ":utf8\0:utf8";
   
   # use fetures qw/sat switch/;
@@ -40,7 +40,7 @@ sub import {
 
 =head1 NAME
 
-Stuff::Features
+Stuff::Features - Set up code compiling and excecution features
 
 =head1 SYNOPSIS
 
