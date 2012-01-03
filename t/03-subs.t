@@ -1,21 +1,13 @@
 #!/usr/bin/env perl
 
-use Test::More tests => 12;
+use Test::More tests => 10;
 use Stuff::Features;
 
 BEGIN {
-  use_ok 'Stuff::Defs';
-  
-  my @subs = qw/def inherit_defs/;
-  Stuff::Defs->import( @subs );
-  
-  for( @subs ) {
-    no strict 'refs';
-    ok defined *{$_}{CODE}, "$_ imported";
-  }
+  use_ok 'Stuff::Subs';
 }
 
-def( 'TestPackage1', def => \&Stuff::Defs::def );
+Stuff::Subs::make( 'TestPackage1', def => \&Stuff::Subs::make );
 can_ok( 'TestPackage1', 'def' );
 
 TestPackage1::def( arguments => sub ($) { $_[1] } );
@@ -24,7 +16,7 @@ is( prototype \&TestPackage1::arguments, '$' );
 is( TestPackage1::arguments( 'hello' ), 'hello' );
 is( TestPackage1->arguments( 'hello' ), 'hello' );
 
-inherit_defs( 'TestPackage2', 'TestPackage1' );
+Stuff::Subs::inherit( 'TestPackage2', 'TestPackage1' );
 
 can_ok( 'TestPackage2', 'def' );
 can_ok( 'TestPackage2', 'arguments' );

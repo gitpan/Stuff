@@ -23,7 +23,7 @@ BEGIN {
   };
   
   def set_table => sub($) {
-    Stuff::def $_[0], table => $_[1];
+    Stuff::Subs::make $_[0], table => $_[1];
   };
 }
 

@@ -1,13 +1,14 @@
 package Stuff::Base;
 
 use Stuff::Features;
-use Stuff::Defs qw/ def inherit_defs /;
-use Stuff::Util qw/ is_package_name load_module /;
+use Stuff::Subs;
+use Stuff::Util;
 use Carp;
+use Data::Dumper;
 
 our $EXCEPTION_HANDLER;
 
-sub relative_package {
+sub _relative_package {
   my( $package, $l, $relative ) = @_;
   my @parts = split( /::/, $package );
   
@@ -19,33 +20,28 @@ sub relative_package {
 }
 
 sub extend {
-  my $package = shift;
-  my %options = ref $_[0] eq 'HASH' ? %{shift @_} : ();
-  
   no strict 'refs';
   
-  # Configurable namespace.
-  my $namespace = $options{namespace} || 'Stuff::Base';
-  is_package_name( $namespace ) or croak( qq/Bad namespace "$namespace"/ );
-  $namespace .= '::';
-  
-  my @bases;
+  my $package = shift;
+  my %flags;
+  my( @all, @bases );
   
   for my $base( map { split( /\s+/, $_ ) } @_ ) {
     $base =~ s/:+$//;
+    $base =~ s/^:+//;
     
-    # Short base classe or option.
+    # Short base classe or flag.
     if( $base =~ s/^-// ) {
       if( $base =~ /^[a-z]/ ) {
-        $options{$base} = 1;
+        $flags{$base} = 1;
         next;
       }
       
-      $base = $namespace.$base;
+      $base = 'Stuff::Base::'.$base;
     }
     # Relative base class.
     elsif( $base =~ /^(\.+)(.*)/ ) {
-      $base = relative_package( $package, length( $1 ) - 1, $2 );
+      $base = _relative_package( $package, length( $1 ) - 1, $2 );
     }
     
     if( $base->isa( $package ) ) {
@@ -55,9 +51,9 @@ sub extend {
     next if grep { $_->isa( $base ) } ( $package, @bases );
     
     if( !defined ${ $base.'::VERSION' } ) {
-      my $loaded = load_module(
+      my $loaded = Stuff::Util::load_module(
         $base,
-        $options{exception_handler} || $EXCEPTION_HANDLER || *Stuff::Exception::rethrow{CODE}
+        $EXCEPTION_HANDLER || *Stuff::Exception::rethrow{CODE}
       );
       
       if( !grep { !/::$/ } keys %{"$base\::"} ) {
@@ -73,16 +69,22 @@ sub extend {
         if !defined ${ $base.'::VERSION' };
     }
     
-    push @bases, $base;
+    push @all, $base;
+    push @bases, $base unless Stuff::Subs::package_info( $base )->{mixin};
   }
   
-  if( @bases ) {
-    my $isa = \@{ "$package\::ISA" };
-    push @$isa, @bases;
-    inherit_defs( $package, @bases ) unless $options{no_defs};
+  if( $flags{mixin} ) {
+    # Mark package as a mixin.
+    Stuff::Subs::package_info( $package )->{mixin} = 1;
   }
   
-  def( $package, def => \&def ) if $options{def};
+  push @{ "$package\::ISA" }, @bases;
+  
+  Stuff::Subs::inherit( $package, @all );
+  
+  if( $flags{def} ) {
+    Stuff::Subs::make( $package, def => \&Stuff::Subs::make );
+  }
 }
 
 sub import {
@@ -121,7 +123,6 @@ Stuff::Base - The right "use base"
 =head2 C<extend>
 
   Stuff::Base::extend( $package, @base_packages );
-  Stuff::Base::extend( $package, \%options, @base_packages );
 
 Adds C<@base_packages> to C<$package>'s ISA packages and inherit defs from C<@base_packages>.
 
@@ -132,10 +133,6 @@ is equvalent to
   BEGIN {
     Stuff::Base::extend( __PACKAGE__, @args );
   }
-
-=head2 C<def>
-
-An alias for Stuff::Defs::def
 
 =head1 IMPORT
 

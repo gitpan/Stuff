@@ -1,6 +1,7 @@
 package Stuff::Base::Object;
 
 use Stuff::Features;
+use Stuff::Util qw/ clone /;
 use Stuff::Base -def;
 
 # Attribute maker.

@@ -1,5 +1,0 @@
-=head1 NAME
-
-Stuff - Object oriented programming framework
-
-=cut

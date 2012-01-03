@@ -5,7 +5,7 @@ use Stuff::Features;
 
 BEGIN {
   use_ok 'Stuff::Base';
-  *relative_package = \&Stuff::Base::relative_package;
+  *relative_package = \&Stuff::Base::_relative_package;
 }
 
 BEGIN {
@@ -24,7 +24,7 @@ BEGIN {
   };
   
   def set_table => sub($) {
-    Stuff::Base::def $_[0], table => $_[1];
+    Stuff::Subs::make $_[0], table => $_[1];
   };
 }
 
@@ -69,7 +69,6 @@ is TestDef::Base::table,     'base'          , 'TestDef::Base::table';
 is TestDef::Child1::table,   'something'     , 'TestDef::Child1::table';
 is TestDef::Child2::table,   'child2'        , 'TestDef::Child2::table';
 is TestDef::Child3::table,   'something'     , 'TestDef::Child3::table';
-
 
 is relative_package( 'A::B::C::D', 0, 'E' ), 'A::B::C::D::E';
 is relative_package( 'A::B::C::D', 1, 'E' ), 'A::B::C::E';

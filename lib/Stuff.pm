@@ -2,9 +2,8 @@ package Stuff;
 
 use Stuff::Features;
 use Stuff::Base;
-use Stuff::Defs qw/ def /;
 
-our $VERSION = '0.0.6';
+our $VERSION = '0.0.8';
 
 sub import {
   shift;

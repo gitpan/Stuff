@@ -1,12 +1,12 @@
 #!/usr/bin/env perl
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 use Stuff::Features;
 
 BEGIN {
   use_ok 'Stuff::Util';
   
-  my @subs = qw/ is_package_name load_module /;
+  my @subs = qw/ plainize clone load_module /;
   Stuff::Util->import( @subs );
   
   for( @subs ) {
