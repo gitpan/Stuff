@@ -124,7 +124,7 @@ Stuff::Base - The right "use base"
 
   Stuff::Base::extend( $package, @base_packages );
 
-Adds C<@base_packages> to C<$package>'s ISA packages and inherit defs from C<@base_packages>.
+Adds C<@base_packages> to C<$package>'s ISA list and imports autoimported subs from C<@base_packages>.
 
   use Stuff::Base @args;
 
@@ -140,7 +140,7 @@ is equvalent to
 
 =head1 SEE ALSO
 
-L<Stuff>, L<Stuff::Defs>
+L<Stuff>, L<Stuff::Subs>
 
 =head1 AUTHOR
 

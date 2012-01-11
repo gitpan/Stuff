@@ -29,12 +29,12 @@ sub const {
   }
 }
 
-sub set_autoimport {
+sub set_autoexport {
   my $pkg = shift;
   package_subs( $pkg )->{$_} = 1 for @_;
 }
 
-sub unset_autoimport {
+sub unset_autoexport {
   my $pkg = shift;
   package_subs( $pkg )->{$_} = 0 for @_;
 }
@@ -140,30 +140,50 @@ sub remove {
 
 =head1 NAME
 
-Stuff::Subs - Special subroutines stuff
+Stuff::Subs - Autoexported subroutines stuff
 
 =head1 FUNCTIONS
-
-=head2 C<make>
-
-  Stuff::Subs::make( $package, $name => $value );
-
-Defines a function or constant in package C<$package> that will be exported into
-child package with C<inherit>.
 
 =head2 C<inherit>
 
   Stuff::Subs::inherit( $package, @bases );
 
-Import subs from @bases packages. Subs must marked for import with C<autoimported>.
+Imports subs from @bases packages. Subs must marked for export with C<set_autoexport> or created with C<make>.
 
-=head2 C<set_autoimport>
+=head2 C<set_autoexport>
 
-  Stuff::Subs::set_autoimport( $package, @names );
+  Stuff::Subs::set_autoexport( $package, @names );
 
-=head2 C<unset_autoimport>
+=head2 C<unset_autoexport>
 
-  Stuff::Subs::unset_autoimport( $package, @names );
+  Stuff::Subs::unset_autoexport( $package, @names );
+
+=head2 C<make>
+
+  Stuff::Subs::make( $package, $name => $value );
+
+Defines a autoexported function or constant in package C<$package> that will be exported into
+child package with C<inherit>.
+
+C<Stuff::Subs::make> adds package name (or object) the function was called from to arguments of created function when it's called.
+
+  package MyPackage;
+  use Stuff::Base -Object;
+  
+  Stuff::Subs::make( __PACKAGE__, fn => sub { print join ' ' => @_; } );
+  
+  fn( 'test' ); => "MyPackage test";
+  MyPackage->fn( 'test' ); => "MyPackage test";
+  MyPackage->new->fn( 'test' ); => "MyPackage=HASH(...) test";
+
+  package AnotherPackage;
+  # use Stuff::Base 'MyPackage';
+  BEGIN {
+    Stuff::Subs::inherit( __PACKAGE__, 'MyPackage' );
+  }
+  
+  fn( 'test' ); => "AnotherPackage test";
+  AnotherPackage->fn( 'test' ); => "AnotherPackage test";
 
 =head1 AUTHOR
 

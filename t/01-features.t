@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 BEGIN {
   use_ok 'Stuff::Features';
@@ -41,6 +41,15 @@ check_strict 'refs', 'use TestFeaturesImport', '*{"__"} = {}';
 
 # feature.
 ok( !HAS_FEATURE || eval( 'my $a; given(1) { when(1) { $a = 1 } }; $a' ), 'feature' );
+
+{
+  package _A;                     sub m { 'A' }
+  package _B; our @ISA = qw/ _A /;
+  package _C; our @ISA = qw/ _A /;    sub m { 'C' }
+  package _D; our @ISA = qw/ _B _C /; use Stuff::Features; 
+}
+
+is( _D->m, 'C' );
 
 # utf8.
 my $str = "я";
