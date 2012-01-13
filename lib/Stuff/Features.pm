@@ -3,10 +3,13 @@ package Stuff::Features;
 use 5.008;
 use strict;
 use utf8;
-use mro;
+
 no warnings;
 
-use constant HAS_FEATURE => eval { require feature; };
+use constant {
+  # HAS_MRO     => eval { require mro; },
+  HAS_FEATURE => eval { require feature; },
+};
 
 # use open qw/:utf8 :std/;
 binmode( $_, ':utf8' )
@@ -30,7 +33,7 @@ sub init {
   / );
   
   # use mro 'c3';
-  mro::set_mro( $package, 'c3' );
+  # mro::set_mro( $package, 'c3' ) if HAS_MRO;
   
   # use utf8;
   utf8->import;
@@ -68,7 +71,6 @@ is a short replacement for
     taint threads unpack
   / );
   use utf8;
-  use mro 'c3';
   use open qw/:utf8 :std/;
   use feature qw/say switch/;
 

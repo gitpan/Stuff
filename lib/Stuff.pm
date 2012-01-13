@@ -3,7 +3,7 @@ package Stuff;
 use Stuff::Features;
 use Stuff::Base;
 
-our $VERSION = '0.0.9';
+our $VERSION = '0.0.10';
 
 sub import {
   shift;
