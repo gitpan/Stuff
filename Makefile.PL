@@ -17,6 +17,6 @@ my %args = (
 
 my $mmver = $ExtUtils::MakeMaker::VERSION;
 
-$args{LICENSE}= 'artistic_2' if $mmver >= 6.3002;
+$args{LICENSE} = 'artistic_2' if $mmver >= 6.3002;
 
 WriteMakefile( %args );

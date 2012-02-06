@@ -3,8 +3,8 @@
 use Test::More tests => 10;
 
 BEGIN {
-  use_ok 'Stuff::Exception';
-  Stuff::Exception->import( qw/ catch expect / );
+  use_ok 'Stuff::Exceptions';
+  Stuff::Exceptions->import( qw/ catch expect / );
   
   package TestException;
   use Stuff -Exception;
@@ -22,7 +22,7 @@ ok blessed( $@ ) && $@->message eq '123', 'exception message';
 ok blessed( $@ ) && blessed( $@->frames->[0] ), 'exception frame';
 
 for( catch { die "123" } ) {
-  ok blessed( $_ ) && $_->isa( 'Stuff::Base::Error' ), 'Stuff::Base::Error is default';
+  ok blessed( $_ ) && $_->isa( 'Stuff::Error' ), 'Stuff::Error is default';
   ok blessed( $_ ) && $_->message =~ /^123/, 'message ok';
 }
 

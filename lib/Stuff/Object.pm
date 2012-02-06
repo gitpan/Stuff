@@ -1,8 +1,8 @@
-package Stuff::Base::Object;
+package Stuff::Object;
 
 use Stuff::Features;
-use Stuff::Util qw/ clone /;
 use Stuff::Base -def;
+use Stuff::Util qw/ clone /;
 
 # Attribute maker.
 def has => sub { shift->define_attr( @_ ) };
@@ -25,20 +25,28 @@ sub define_attr {
   
   # Attribute names.
   my $names = shift;
-  $names = [ $names ] unless ref $names eq 'ARRAY';
   
   # Default value and params.
   my( $default, $params );
   
-  if( @_ ) {
-    $default = shift if ref $_[0] eq 'CODE' || ref $_[0] eq '';
-    
-    $params = ref $_[0] eq 'HASH' ? $_[0] : {@_};
-    
-    $default = $params->{default} if exists $params->{default};
+  if( ref $names eq 'HASH' ) {
+    $params = $names;
+    $names = $params->{name};
+    $default = $params->{default};
+  }
+  else {
+    if( @_ % 2 == 0 ) {
+      $params = {@_};
+      $default = $params->{default};
+    }
+    else {
+      $default = shift;
+      $params = {@_};
+      $params->{default} = $default;
+    }
   }
   
-  for( @$names ) {
+  for( ref $names eq 'ARRAY' ? @$names : $names ) {
     ( my $name = $_ ) =~ s/^-//;
     
     # Check attribute name validity.
@@ -89,7 +97,7 @@ sub _generate_accessor {
   my $sub = eval $code;
   
   # Handle compilation errors.
-  die "Accessor compilation error: \n$code\n$@\n" if $@;
+  die "Accessor compilation error:\n$code\n$@\n" if $@;
   
   return $sub;
 }

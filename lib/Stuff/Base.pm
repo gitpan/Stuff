@@ -37,7 +37,7 @@ sub extend {
         next;
       }
       
-      $base = 'Stuff::Base::'.$base;
+      $base = 'Stuff::'.$base;
     }
     # Relative base class.
     elsif( $base =~ /^(\.+)(.*)/ ) {
@@ -53,7 +53,7 @@ sub extend {
     if( !defined ${ $base.'::VERSION' } ) {
       my $loaded = Stuff::Util::load_module(
         $base,
-        $EXCEPTION_HANDLER || *Stuff::Exception::rethrow{CODE}
+        $EXCEPTION_HANDLER || *Stuff::Exceptions::rethrow{CODE}
       );
       
       if( !grep { !/::$/ } keys %{"$base\::"} ) {
@@ -84,6 +84,11 @@ sub extend {
   
   if( $flags{def} ) {
     Stuff::Subs::make( $package, def => \&Stuff::Subs::make );
+  }
+  
+  if( $flags{c3} ) {
+    require mro;
+    mro::set_mro( $package => 'c3' );
   }
 }
 

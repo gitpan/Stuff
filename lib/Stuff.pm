@@ -2,8 +2,9 @@ package Stuff;
 
 use Stuff::Features;
 use Stuff::Base;
+use Stuff::Exception;
 
-our $VERSION = '0.0.10';
+our $VERSION = '0.0.11';
 
 sub import {
   shift;
@@ -15,7 +16,7 @@ sub import {
 
 =head1 NAME
 
-Stuff - Object oriented programming framework
+Stuff - Essential runtime support
 
 =head1 NOTE
 

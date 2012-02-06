@@ -1,4 +1,4 @@
-package Stuff::Base::Error;
+package Stuff::Error;
 
 use Stuff -Exception;
 
@@ -9,7 +9,7 @@ has verbose => 1;
 
 =head1 NAME
 
-Stuff::Base::Error - Error exception class
+Stuff::Error - Error exception class
 
 =head1 DESCRIPTION
 

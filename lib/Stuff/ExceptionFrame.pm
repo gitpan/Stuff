@@ -1,4 +1,4 @@
-package Stuff::Base::ExceptionFrame;
+package Stuff::ExceptionFrame;
 
 use Stuff;
 
@@ -29,12 +29,12 @@ BEGIN {
 
 1;
 
-=head1 NAME
-
-Stuff::Base::ExceptionFrame - Exception frame
-
-=head1 AUTHOR
-
-Nikita Zubkov E<lt>nikzubkov@gmail.comE<gt>.
-
-=cut
+# =head1 NAME
+# 
+# Stuff::ExceptionFrame - Exception frame
+# 
+# =head1 AUTHOR
+# 
+# Nikita Zubkov E<lt>nikzubkov@gmail.comE<gt>.
+# 
+# =cut

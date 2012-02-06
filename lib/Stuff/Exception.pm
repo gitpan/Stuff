@@ -1,102 +1,149 @@
 package Stuff::Exception;
 
-use Stuff;
-use Stuff::Base::Exception;
-use Stuff::Base::Error;
-use Stuff::Util qw/ plainize /;
-use Scalar::Util qw/ blessed /;
-use Carp;
+use Stuff::Features;
+use Stuff::Base -StackTrace;
+use Scalar::Util 'blessed';
 
-# Export.
-use Exporter 'import';
-our @EXPORT_OK = qw/ expect catch caught rethrow /;
-our %EXPORT_TAGS = { all => \@EXPORT_OK };
+# Overload boolean check and stringifiction.
+use overload
+  bool => sub { 1 },
+  '""' => 'to_string',
+  fallback => 1;
 
-# List of expected exception classes.
-our @expected;
+# Message associated with exception.
+has message => 'Exception!';
 
-# Exception classes.
-my $exception_class = 'Stuff::Base::Exception';
-my $error_class     = 'Stuff::Base::Error';
+# Verbosity level of "to_string".
+has verbose => 0;
 
-sub rethrow(;$) {
-  my $e = @_ ? $_[0] : $@;
-  
-  die $e
-    if blessed( $e ) && $e->isa( $exception_class );
-  
-  $error_class->throw( $e );
+# Collect exception frames?
+#  * false - collect
+#  * true - don't collect
+has no_frames => 0;
+
+# Raw frames, as they come from caller().
+has raw_frames => sub {
+  my $self = shift;
+  ( $self->no_frames || $self->is_expected ) ? [] : $self->_collect_frames;
+};
+
+# Constructor.
+sub new {
+  shift->SUPER::new( @_ == 1 ? ( message => $_[0] ) : @_ );
 }
 
-sub catch(&;$) {
-  my $code = shift;
+# Exception stringificator.
+sub to_string {
+  my $self = shift;
+  my $message = ''.$self->message;
   
-  eval {
-    local $SIG{__DIE__} = \&rethrow;
-    &$code();
-  };
   
-  if( $@ ) {
-    return $@ unless defined $_[0];
-    if( blessed $@ ) {
-      for( plainize( $_[0] ) ) {
-        return $@ if $@->isa( $_ );
-      }
-    }
-    die $@;
-  }
-  
-  return;
+  $message;
 }
 
-sub caught {
-  my $e = @_ > 1 ? $_[1] : $@;
-  blessed( $e ) && $e->isa( $_[0] );
-}
-
+# Check whatever this exception is expected and we can skip frames collection.
 sub is_expected {
-  my $e = $_[0];
-  return unless blessed $e;
-  for( @expected ) {
-    return 1 if $e->isa( $_ );
+  my $self = shift;
+  for( @Stuff::Exceptions::expected ) {
+    return 1 if $self->isa( $_ );
   }
   return;
 }
 
-sub expect(&;$) {
-  my $code = shift;
+# Throw exception.
+sub throw {
+  my $self = shift;
+  die $self if blessed $self;
+  die $self->new( @_ );
+}
+
+# Rethrow exception.
+sub rethrow {
+  my $self = shift;
   
-  local @expected = defined $_[0] ? plainize( $_[0] ) : ();
+  if( @_ ) {
+    my $e = $_[0];
+    die $e if blessed( $e ) && $e->isa( __PACKAGE__ );
+  }
+  else {
+    die $self if blessed $self;
+  }
   
-  eval {
-    local $SIG{__DIE__} = \&rethrow;
-    &$code();
-  };
-  
-  return $@ if $@ && is_expected $@;
-  return;
+  die $self->new( @_ );
 }
 
 1;
 
 =head1 NAME
 
-Stuff::Exception - Exception handling build on Stuff and for Stuff
+Stuff::Exception - Exception with context
 
-=head1 NOTE
+=head1 SYNOPSIS
 
-This framework is NOT STABLE yet and API can change without any warning!
-Writing of documentation still in progress.
+  # Create own exception class.
+  package HttpAbortException;
+  use Stuff -Exception; # <= push @ISA, qw( Stuff::Base::Exception );
+  has status => 0;
+  has no_stack_trace => 1;
+  
+  # Instantiate exception.
+  my $e = HttpAbortException->new( status => 404, message => 'Request aborted' );
+  
+  # Get attibute.
+  say $e->status; # => 404
+  
+  # Automatic stringification.
+  say $e; # => 'Request aborted'
+  
+  # Throw exception.
+  $e->throw;
+  
+  # Or instantiate and throw.
+  HttpAbortException->throw( status => 404 );
+  
+  eval {
+    HttpAbortException->throw( status => 404 );
+  };
+  
+  $@->status; # => 404
 
-=head1 FUNCTIONS
+=head1 METHODS
 
-=head2 C<catch>
+C<Stuff::Exception> inherit all methods from Stuff::Base::Object and implements the following:
 
-=head2 C<caught>
+=head2 C<new>
 
-=head2 C<expect>
+  $package->new;
+  $package->new( $message );
+  $package->new( %args );
 
-=head2 C<rethrow>
+=head2 C<throw>
+
+  $package->throw;
+  $package->throw( $message );
+  $package->throw( %args );
+  $object->throw;
+
+=head2 C<to_string>
+
+  $object->to_string;
+  "$object";
+
+Returns a string that represents exception. By default it is a message translated to string.
+
+=head1 ATTRIBUTES
+
+=head2 C<message>
+
+Optional message associated with exception. In general cases it can be any object, not string and number only.
+
+=head2 C<no_stack_frames>
+
+If it has true value then no stack frames will be collected duering object instantiation. Default value is false. 
+
+=head1 SEE ALSO
+
+L<Stuff>, L<Stuff::Exception>
 
 =head1 AUTHOR
 

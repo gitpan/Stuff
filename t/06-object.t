@@ -3,7 +3,7 @@
 use Test::More tests => 16;
 
 BEGIN {
-  use_ok 'Stuff::Base::Object';
+  use_ok 'Stuff::Object';
 }
 
 BEGIN {
