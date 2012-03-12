@@ -5,13 +5,13 @@ use Test::More tests => 3;
 BEGIN {
   use_ok 'Stuff::StackTrace';
   
-  package TestException;
+  package MyStackTrace;
   use Stuff -StackTrace;
 }
 
 use Stuff;
 use Scalar::Util qw/ blessed /;
 
-my $trace = Stuff::StackTrace->new;
+my $trace = MyStackTrace->new;
 ok $trace;
 ok blessed( $trace->frames->[0] );

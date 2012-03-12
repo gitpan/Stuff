@@ -2,18 +2,24 @@ package Stuff::Features;
 
 use 5.008;
 use strict;
-use utf8;
 
 no warnings;
 
 use constant {
-  # HAS_MRO     => eval { require mro; },
+  UTF8        => defined $ENV{STUFF_UTF8} ? ($ENV{STUFF_UTF8} ? 1 : 0) : 1,
   HAS_FEATURE => eval { require feature; },
 };
 
-# use open qw/:utf8 :std/;
-binmode( $_, ':utf8' )
-  for qw/STDIN STDOUT STDERR/;
+BEGIN {
+  if( UTF8 ) {
+    # use utf8;
+    require utf8;
+    
+    # use open qw/:utf8 :std/;
+    binmode( $_, ':utf8' )
+      for qw/STDIN STDOUT STDERR/;
+  }
+}
 
 sub init {
   my $package = shift || caller;
@@ -32,14 +38,13 @@ sub init {
     taint threads unpack
   / );
   
-  # use mro 'c3';
-  # mro::set_mro( $package, 'c3' ) if HAS_MRO;
-  
-  # use utf8;
-  utf8->import;
-  
-  # use open qw/:utf8/;
-  ${^OPEN} = ":utf8\0:utf8";
+  if( UTF8 ) {
+    # use utf8;
+    utf8->import;
+    
+    # use open qw/:utf8/;
+    ${^OPEN} = ":utf8\0:utf8";
+  }
   
   # use fetures qw/sat switch/;
   feature->import( qw/say switch/ ) if HAS_FEATURE;
@@ -70,9 +75,9 @@ is a short replacement for
     digit printf prototype reserved semicolon
     taint threads unpack
   / );
+  use feature qw/say switch/;
   use utf8;
   use open qw/:utf8 :std/;
-  use feature qw/say switch/;
 
 =head1 SEE ALSO
 

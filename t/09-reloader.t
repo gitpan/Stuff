@@ -3,6 +3,5 @@
 use Test::More tests => 1;
 
 BEGIN {
-  use_ok 'Stuff::Reload';
+  use_ok 'Stuff::Reloader';
 }
-

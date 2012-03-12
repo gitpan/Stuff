@@ -1,6 +1,6 @@
 package Stuff::Exceptions;
 
-use Stuff;
+use Stuff::Features;
 use Stuff::Exception;
 use Stuff::Error;
 use Stuff::Util qw/ plainize /;
@@ -29,11 +29,11 @@ sub rethrow(;$) {
 }
 
 sub catch(&;$) {
-  my $code = shift;
+  # my $code = shift;
   
   eval {
     local $SIG{__DIE__} = \&rethrow;
-    &$code();
+    &{+shift}();
   };
   
   if( $@ ) {

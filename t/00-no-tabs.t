@@ -6,5 +6,5 @@ if( eval q/use Test::NoTabs; 1/ ) {
   all_perl_files_ok();
 }
 else {
-  plan skip_all => 'No Test::NoTabs module';
+  plan skip_all => 'Failed to load Test::NoTabs module';
 }

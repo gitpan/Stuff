@@ -36,8 +36,7 @@ sub new {
 sub to_string {
   my $self = shift;
   my $message = ''.$self->message;
-  
-  
+  $message .= "\n" . SUPER::to_string( @_ ) if $self->verbose;
   $message;
 }
 
@@ -82,7 +81,7 @@ Stuff::Exception - Exception with context
 
   # Create own exception class.
   package HttpAbortException;
-  use Stuff -Exception; # <= push @ISA, qw( Stuff::Base::Exception );
+  use Stuff -Exception; # <= push @ISA, qw( Stuff::Exception );
   has status => 0;
   has no_stack_trace => 1;
   
@@ -109,7 +108,7 @@ Stuff::Exception - Exception with context
 
 =head1 METHODS
 
-C<Stuff::Exception> inherit all methods from Stuff::Base::Object and implements the following:
+C<Stuff::Exception> inherit all methods from Stuff::Object and implements the following:
 
 =head2 C<new>
 
@@ -135,9 +134,9 @@ Returns a string that represents exception. By default it is a message translate
 
 =head2 C<message>
 
-Optional message associated with exception. In general cases it can be any object, not string and number only.
+Optional message associated with exception. In general cases it can be any object, not string or number only.
 
-=head2 C<no_stack_frames>
+=head2 C<no_frames>
 
 If it has true value then no stack frames will be collected duering object instantiation. Default value is false. 
 

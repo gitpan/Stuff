@@ -3,10 +3,13 @@
 use 5.008;
 use ExtUtils::MakeMaker;
 
-my %args = (
+WriteMakefile(
   NAME => 'Stuff',
   VERSION_FROM => 'lib/Stuff.pm',
   AUTHOR => 'Nikita Zubkov <nikzubkov@gmail.com>',
+  ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? (
+    LICENSE => 'artistic_2'
+  ) : () ),
   PREREQ_PM => {
     'Carp' => 0,
     'Scalar::Util' => 0,
@@ -14,9 +17,3 @@ my %args = (
   },
   test => { TESTS => 't/*.t' }
 );
-
-my $mmver = $ExtUtils::MakeMaker::VERSION;
-
-$args{LICENSE} = 'artistic_2' if $mmver >= 6.3002;
-
-WriteMakefile( %args );

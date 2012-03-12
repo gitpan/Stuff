@@ -4,7 +4,7 @@ use Stuff::Features;
 use Stuff::Base;
 use Stuff::Exception;
 
-our $VERSION = '0.0.11';
+our $VERSION = '0.0.13';
 
 sub import {
   shift;

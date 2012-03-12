@@ -109,8 +109,8 @@ Stuff::Base - The right "use base"
   # import defs from them and their baases.
   use Stuff::Base 'MyBase1 MyBase2';
   
-  # Load "Stuff::Base::Object" and add it to ISA,
-  # import defs from "Stuff::Base::Object" and its baases.
+  # Load "Stuff::Object" and add it to ISA,
+  # import defs from "Stuff::Object" and its baases.
   use Stuff::Base -Object;
   
   # Import "def" function.
@@ -118,9 +118,9 @@ Stuff::Base - The right "use base"
   
   # Relative bases.
   package Very::Long::Package::Name;
-  use Stuff::Base '.Haha';   # use Stuff::Base 'Very::Long::Package::Name::Haha';
-  use Stuff::Base '..Haha';  # use Stuff::Base 'Very::Long::Package::Haha';
-  use Stuff::Base '...Haha'; # use Stuff::Base 'Very::Long::Haha';
+  use Stuff::Base '.Haha';   # same as: use Stuff::Base 'Very::Long::Package::Name::Haha';
+  use Stuff::Base '..Haha';  # same as: use Stuff::Base 'Very::Long::Package::Haha';
+  use Stuff::Base '...Haha'; # same as: use Stuff::Base 'Very::Long::Haha';
   # .. etc
 
 =head1 FUNCTIONS

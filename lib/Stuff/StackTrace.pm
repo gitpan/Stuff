@@ -2,7 +2,7 @@ package Stuff::StackTrace;
 
 use Stuff::Features;
 use Stuff::Base -Object;
-use Stuff::ExceptionFrame;
+use Stuff::StackTraceFrame;
 
 # Overload boolean check and stringifiction.
 use overload
@@ -16,7 +16,7 @@ has raw_frames => sub {
 };
 
 # Class for exception frame object.
-has frame_class => 'Stuff::ExceptionFrame';
+has frame_class => 'Stuff::StackTraceFrame';
 
 # Processed frames.
 has frames => sub {
@@ -43,8 +43,33 @@ sub new {
   $self;
 }
 
-sub to_string {
+sub substract {
+  my( $self, $other ) = @_;
   
+  my $frames1 = $self->raw_frames;
+  my $frames2 = ( $other || $self->new )->raw_frames;
+  
+  if( $frames1 && $frames2 ) {
+    for my $f2( reverse @$frames2 ) {
+      my $f1 = $frames1->[-1] or last;
+      
+      $f1->[1] eq $f2->[1] && $f1->[2] eq $f2->[2] or last;
+      
+      pop @$frames1;
+    }
+  }
+  
+  delete $self->{frames};
+  
+  $self;
+}
+
+sub to_string {
+  my $self = shift;
+  
+  join( '' => map {
+    "  [".( join( ':' => $_->filename, $_->line ) )."]\n"
+  } @{$self->frames} );
 }
 
 sub _collect_frames {
@@ -65,7 +90,22 @@ Stuff::StackTrace
 
 =head1 METHODS
 
-=head2 C<grab>
+=head2 C<new>
+
+  my $trace = Stuff::StackTrace->new;
+  my $trace = Stuff::StackTrace->new( frame_classs => 'MyStackTraceFrame' );
+  my $trace = Stuff::StackTrace->new( raw_frames => \@raw_frames );
+  my $trace = Stuff::StackTrace->new( frames => \@frames );
+  
+=head2 C<to_string>
+
+  my $string = $trace->to_string;
+  my $string = "$trace";
+
+=head2 C<substract>
+
+  $trace->substract; # same as $trace->substract( $trace->new );
+  $trace->substract( $other_trace );
 
 =head1 ATTRIBUTES
 
@@ -75,8 +115,10 @@ Stack frames, as they come from caller(...).
 
 =head2 C<frames>
 
-Stack frames converted to objects.
+Stack frames converted to objects of class C<frame_class>.
 
 =head2 C<frame_class>
+
+Class for frame objects.
 
 =cut

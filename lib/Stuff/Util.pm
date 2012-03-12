@@ -41,6 +41,7 @@ sub load_module($;$) {
 }
 
 sub clone {
+  
 }
 
 1;

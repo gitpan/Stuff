@@ -1,9 +1,9 @@
 package Stuff::Error;
 
-use Stuff -Exception;
+use Stuff::Features;
+use Stuff::Base -Exception;
 
 has message => 'Error!';
-has verbose => 1;
 
 1;
 
@@ -17,11 +17,11 @@ This is default exception class for Stuff::Exception.
 
 =head1 METHODS
 
-C<Stuff::Base::Error> inherit all methods and attributes from C<Stuff::Base::Exception>.
+C<Stuff::Error> inherit all methods and attributes from C<Stuff::Exception>.
 
 =head1 SEE ALSO
 
-L<Stuff>, L<Stuff::Exception>, L<Stuff::Base::Exception>
+L<Stuff>, L<Stuff::Exceptions>, L<Stuff::Exception>
 
 =head1 AUTHOR
 

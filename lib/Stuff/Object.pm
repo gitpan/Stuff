@@ -10,12 +10,15 @@ def has => sub { shift->define_attr( @_ ) };
 # Constructor.
 sub new {
   my $proto = shift;
+  my $self = bless {}, ref $proto || $proto;
   
-  my $self = @_
-    ? UNIVERSAL::isa( $_[0], 'HASH' ) ? { %{ $_[0] } } : { @_ }
-    : {};
-  
-  bless $self, ref $proto || $proto;
+  $self->initialize( @_ );
+  $self;
+}
+
+sub initialize {
+  my $self = shift;
+  %$self = UNIVERSAL::isa( $_[0], 'HASH' ) ? %{$_[0]} : @_;
 }
 
 sub define_attr {
@@ -97,7 +100,7 @@ sub _generate_accessor {
   my $sub = eval $code;
   
   # Handle compilation errors.
-  die "Accessor compilation error:\n$code\n$@\n" if $@;
+  die qq/Accessor compilation error:\n$code\n$@\n/ if $@;
   
   return $sub;
 }
@@ -106,7 +109,7 @@ sub _generate_accessor {
 
 =head1 NAME
 
-Stuff::Base::Object - Object class with attributes
+Stuff::Object - Object class with attributes
 
 =head1 SYNOPSIS
 
