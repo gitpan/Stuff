@@ -5,7 +5,7 @@ use Stuff::Features;
 
 BEGIN {
   use_ok 'Stuff::Base';
-  *relative_package = \&Stuff::Base::_relative_package;
+  *relative_package = \&Stuff::Base::relative_package;
 }
 
 BEGIN {
@@ -24,7 +24,7 @@ BEGIN {
   };
   
   def set_table => sub($) {
-    Stuff::Subs::make $_[0], table => $_[1];
+    Stuff::Base::make_sub $_[0], table => $_[1];
   };
 }
 

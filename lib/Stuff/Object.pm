@@ -107,6 +107,7 @@ sub _generate_accessor {
 
 1;
 
+__END__
 =head1 NAME
 
 Stuff::Object - Object class with attributes

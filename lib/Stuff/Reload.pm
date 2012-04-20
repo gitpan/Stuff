@@ -1,8 +1,11 @@
-package Stuff::Reloader;
+package Stuff::Reload;
 
-use Stuff::Features;
-use Stuff::Base -Object;
+use Stuff -Object;
 use Stuff::Exceptions;
+
+use constant {
+  DEBUG => $ENV{STUFF_RELOAD_DEBUG} || 0
+};
 
 use constant {
   MODE_DEFAULT => 0,
@@ -20,6 +23,12 @@ has default_mode => 'reload';
 has -paths;
 has -namespaces;
 
+sub new {
+  my $self = shift->SUPER::new( @_ );
+  $self->snapshot( 'skip' );
+  $self;
+}
+
 sub run {
   my( $self, $cb ) = @_;
   my $modules = $self->check;
@@ -32,11 +41,11 @@ sub run {
         local $SIG{__DIE__} = \&Stuff::Exceptions::rethrow;
         $cb->( $modules );
       };
-      return [$@] if $@;
+      return ref $@ eq 'ARRAY' ? $@ : [$@] if $@;
     }
   }
   else {
-    return $modules->reload
+    return $modules->reload_safe
       if $modules->modified;
   }
   
@@ -126,7 +135,7 @@ sub check {
   
   $has_modifications = 1 if $self->check_custom;
   
-  return Stuff::Reloader::Modules->new(
+  return Stuff::Reload::Modules->new(
     reloader => $self,
     reload_modules => \@reload,
     unload_modules => \@unload,
@@ -213,10 +222,9 @@ sub _package_to_module {
   $str;
 }
 
-package Stuff::Reloader::Modules;
+package Stuff::Reload::Modules;
 
-use Stuff::Features;
-use Stuff::Base -Object;
+use Stuff -Object;
 
 has [qw/
   reloader
@@ -248,6 +256,7 @@ sub reload {
       };
       
       if( $@ ) {
+        $INC{$m} = undef;
         push @errors, $@;
       }
     }
@@ -258,14 +267,86 @@ sub reload {
 
 1;
 
+__END__
 =head1 NAME
 
-Stuff::Reloader - Modules unloader and reloader
+Stuff::Reload - Modules unloader and reloader
 
 =head1 SYNOPSIS
 
-  use Stuff::Reloader;
-  my $reloader = Stuff::Reloader->new( %args );
-  $reloader->run;
+  use Stuff::Reload;
+  my $reload = Stuff::Reload->new( %args );
+  $reload->run;
+
+=head1 METHODS
+
+=head2 C<new>
+
+  my $reload = Stuff::Reload->new( %args );
+
+=head2 C<run>
+
+  my $errors = $modules->run;
+  my $errors = $modules->run( sub {
+    # callback called when any modification happen
+  } );
+
+=head2 C<check>
+
+  my $modules = $reload->check;
+  if( $modules->modified ) {
+    # Do some finalizing...
+    my $errors = $modules->reload_safe;
+  }
+
+Method C<check> checks if any of traced modules were changed.
+Returns $modules object, which can be used to perform custom reload strategy.
+
+=head1 CODE RELOAD STRATEGIES
+
+=head2 Simple reload
+
+You can simply reload your code when it was modified.
+If your modules "pure" (have no side effects at loading) then you can use it.
+
+  # Initialization.
+  use Stuff::Reload;
+  my $reloader = Stuff::Reload->new;
+  
+  # ...
+  
+  # At some point where reload can happen.
+  # All modified modules will be reloaded.
+  my $errors = $reloader->run;
+
+=head2 Smart code replacing
+
+But the best way to reload code is to use unload and restart application initialization process.
+
+  sub init {
+    # initialization code
+  }
+  
+  sub shutdown {
+    # shutdown code
+  }
+  
+  use Stuff::Reload;
+  my $reloader = Stuff::Reload->new(
+    default_mode => 'unload'
+  );
+  
+  init();
+  
+  # ...
+  
+  # At some point where reload can happen.
+  my $errors = $reloader->run( sub {
+    shutdown();
+    
+    shift->reload;
+    
+    init();
+  } );
 
 =cut

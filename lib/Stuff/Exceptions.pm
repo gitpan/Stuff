@@ -79,6 +79,7 @@ sub expect(&;$) {
 
 1;
 
+__END__
 =head1 NAME
 
 Stuff::Exceptions - Exception handling

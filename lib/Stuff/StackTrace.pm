@@ -84,6 +84,7 @@ sub _collect_frames {
 
 1;
 
+__END__
 =head1 NAME
 
 Stuff::StackTrace

@@ -6,19 +6,16 @@ use strict;
 no warnings;
 
 use constant {
-  UTF8        => defined $ENV{STUFF_UTF8} ? ($ENV{STUFF_UTF8} ? 1 : 0) : 1,
-  HAS_FEATURE => eval { require feature; },
+  HAS_FEATURE => eval { require feature } ? 1 : 0,
 };
 
 BEGIN {
-  if( UTF8 ) {
-    # use utf8;
-    require utf8;
-    
-    # use open qw/:utf8 :std/;
-    binmode( $_, ':utf8' )
-      for qw/STDIN STDOUT STDERR/;
-  }
+  # use utf8;
+  require utf8;
+  
+  # use open qw/:utf8 :std/;
+  binmode( $_, ':utf8' )
+    for qw/STDIN STDOUT STDERR/;
 }
 
 sub init {
@@ -38,15 +35,13 @@ sub init {
     taint threads unpack
   / );
   
-  if( UTF8 ) {
-    # use utf8;
-    utf8->import;
-    
-    # use open qw/:utf8/;
-    ${^OPEN} = ":utf8\0:utf8";
-  }
+  # use utf8;
+  utf8->import;
   
-  # use fetures qw/sat switch/;
+  # use open qw/:utf8/;
+  ${^OPEN} = ":utf8\0:utf8";
+  
+  # use fetures qw/say switch/;
   feature->import( qw/say switch/ ) if HAS_FEATURE;
 }
 
@@ -56,6 +51,7 @@ sub import {
 
 1;
 
+__END__
 =head1 NAME
 
 Stuff::Features - Set up code compiling and excecution features

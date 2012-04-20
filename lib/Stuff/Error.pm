@@ -7,6 +7,7 @@ has message => 'Error!';
 
 1;
 
+__END__
 =head1 NAME
 
 Stuff::Error - Error exception class

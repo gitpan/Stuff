@@ -73,6 +73,7 @@ sub rethrow {
 
 1;
 
+__END__
 =head1 NAME
 
 Stuff::Exception - Exception with context
@@ -108,7 +109,7 @@ Stuff::Exception - Exception with context
 
 =head1 METHODS
 
-C<Stuff::Exception> inherit all methods from Stuff::Object and implements the following:
+C<Stuff::Exception> inherit all methods from C<Stuff::StackTrace> and implements the following:
 
 =head2 C<new>
 

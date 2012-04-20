@@ -40,12 +40,19 @@ sub load_module($;$) {
   return 1;
 }
 
+sub use_package($;$) {
+  my $package = shift;
+  &load_module( $package, @_ );
+  return $package;
+}
+
 sub clone {
   
 }
 
 1;
 
+__END__
 =head1 NAME
 
 Stuff::Util

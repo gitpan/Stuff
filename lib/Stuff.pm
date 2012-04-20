@@ -4,7 +4,7 @@ use Stuff::Features;
 use Stuff::Base;
 use Stuff::Exception;
 
-our $VERSION = '0.0.13';
+our $VERSION = '0.0.15';
 
 sub import {
   shift;
@@ -14,9 +14,10 @@ sub import {
 
 1;
 
+__END__
 =head1 NAME
 
-Stuff - Essential runtime support
+Stuff - Essential framework
 
 =head1 NOTE
 
@@ -25,7 +26,7 @@ Writing of documentation still in progress.
 
 =head1 SYNOPSIS
 
-Frontend to C<Stuff::Features>, C<Stuff::Base> and C<Stuff::Subs>.
+Frontend to C<Stuff::Features> and C<Stuff::Base>.
 
   use Stuff @args;
 
@@ -34,11 +35,11 @@ is equivalent to
   use Stuff::Features;
   use Stuff::Base @args;
 
-It is better to use C<use Stuff> in your code, instead of separate C<Stuff::Features>, C<Stuff::Base> and C<Stuff::Subs>.
+It is better to use C<use Stuff> in your code, instead of separate C<Stuff::Features> and C<Stuff::Base>.
 
 =head1 SEE ALSO
 
-L<Stuff::Features>, L<Stuff::Base>, L<Stuff::Subs>, L<Stuff::Exception>
+L<Stuff::Features>, L<Stuff::Base>, L<Stuff::Exception>, L<Stuff::Exceptions>
 
 =head1 REPOSITORY
 
