@@ -40,7 +40,7 @@ sub load_module($;$) {
   return 1;
 }
 
-sub use_package($;$) {
+sub use_module($;$) {
   my $package = shift;
   &load_module( $package, @_ );
   return $package;
